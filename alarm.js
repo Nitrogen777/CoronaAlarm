@@ -4,21 +4,49 @@ const cheerio = require('cheerio');
 const app = express()
 const port = 3040
 
-app.get('/corona', async function(req, res){
-    var result = await axios.get("https://www.worldometers.info/coronavirus/");
+function countryCaps(countryName){
+    return countryName.charAt(0).toUpperCase() + countryName.slice(1);
+}
+async function getTotal(result){
     var $ = cheerio.load(result.data)
-    let israel;
+    return {
+        sick: $("#maincounter-wrap > div > span").eq(0).text().replace("        ", ""),
+        death: $("#maincounter-wrap > div > span").eq(1).text(),
+        recover: $("#maincounter-wrap > div > span").eq(2).text(),
+    };
+}
+async function getCountryInfo(countryName, result){
+    var $ = cheerio.load(result.data)
+    let info;
     $("#main_table_countries_today > tbody > tr > td:nth-child(1)").each((i, elm) =>{
-        if($(elm).text() === "Israel"){
-            israel = $(elm).parent();
-            
+        if($(elm).text() === countryName){
+            info = $(elm).parent();
         }
+        
     })
-    resjs = {sick: $("#maincounter-wrap > div > span").eq(0).text().replace("        ", ""),
-            recover: $("#maincounter-wrap > div > span").eq(2).text(),
-            isick: $(israel).find("td").eq(1).text(),
-            ireco: $(israel).find("td").eq(5).text()}
-    res.send(resjs);
+    
+    let response = {
+        totali: $(info).find("td").eq(1).text().replace(/ +/, ""),
+        newi: $(info).find("td").eq(2).text().replace(/ +/, ""),
+        totald: $(info).find("td").eq(3).text().replace(/ +/, ""),
+        newd: $(info).find("td").eq(4).text().replace(/ +/, ""),
+        recover: $(info).find("td").eq(5).text().replace(/ +/, ""),
+        active: $(info).find("td").eq(6).text().replace(/ +/, ""),
+        critical: $(info).find("td").eq(7).text().replace(/ +/, "")
+    };
+    return response;
+}
+
+
+app.get('/:country', async function(req, res){
+    var result = await axios.get("https://www.worldometers.info/coronavirus/");
+    var countryName = req.params['country'].toLowerCase();
+    if(countryName === "total"){
+        res.send(await getTotal(result));
+    }else{
+        res.send(await getCountryInfo(countryCaps(countryName), result));
+    }
+    
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
