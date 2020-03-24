@@ -36,6 +36,27 @@ async function getCountryInfo(countryName, result){
     };
     return response;
 }
+async function getAll(result){
+    var $ = cheerio.load(result.data)
+    let arr = [];
+    $("#main_table_countries_today > tbody > tr > td:nth-child(1)").each((i, elm) =>{
+        let info = $(elm).parent();
+        let response = {
+            name: $(info).find("td").eq(0).text().replace(/ +/, ""),
+            totali: $(info).find("td").eq(1).text().replace(/ +/, ""),
+            newi: $(info).find("td").eq(2).text().replace(/ +/, ""),
+            totald: $(info).find("td").eq(3).text().replace(/ +/, ""),
+            newd: $(info).find("td").eq(4).text().replace(/ +/, ""),
+            recover: $(info).find("td").eq(5).text().replace(/ +/, ""),
+            active: $(info).find("td").eq(6).text().replace(/ +/, ""),
+            critical: $(info).find("td").eq(7).text().replace(/ +/, "")
+        };
+        arr.push(response);
+    })
+    
+    
+    return {countries: arr};
+}
 
 
 app.get('/:country', async function(req, res){
@@ -43,6 +64,8 @@ app.get('/:country', async function(req, res){
     var countryName = req.params['country'].toLowerCase();
     if(countryName === "total"){
         res.send(await getTotal(result));
+    }else if(countryName === "all"){
+        res.send(await getAll(result));
     }else{
         res.send(await getCountryInfo(countryCaps(countryName), result));
     }
