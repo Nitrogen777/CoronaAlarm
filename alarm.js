@@ -4,9 +4,6 @@ const cheerio = require('cheerio');
 const app = express()
 const port = 3040
 
-function countryCaps(countryName){
-    return countryName.charAt(0).toUpperCase() + countryName.slice(1);
-}
 async function getTotal(result){
     var $ = cheerio.load(result.data)
     return {
@@ -19,7 +16,7 @@ async function getCountryInfo(countryName, result){
     var $ = cheerio.load(result.data)
     let info;
     $("#main_table_countries_today > tbody > tr > td:nth-child(1)").each((i, elm) =>{
-        if($(elm).text() === countryName){
+        if($(elm).text().toLowerCase() === countryName.toLowerCase()){
             info = $(elm).parent();
         }
         
@@ -61,13 +58,13 @@ async function getAll(result){
 
 app.get('/:country', async function(req, res){
     var result = await axios.get("https://www.worldometers.info/coronavirus/");
-    var countryName = req.params['country'].toLowerCase();
+    var countryName = req.params['country'].toLowerCase().replace(/-/g, " ");
     if(countryName === "total"){
         res.send(await getTotal(result));
     }else if(countryName === "all"){
         res.send(await getAll(result));
     }else{
-        res.send(await getCountryInfo(countryCaps(countryName), result));
+        res.send(await getCountryInfo(countryName, result));
     }
     
 });
