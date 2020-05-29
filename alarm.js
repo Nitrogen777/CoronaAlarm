@@ -28,8 +28,8 @@ async function getCountryInfo(countryName, result){
         totald: $(info).find("td").eq(4).text().replace(/ +/, ""),
         newd: $(info).find("td").eq(5).text().replace(/ +/, ""),
         recover: $(info).find("td").eq(6).text().replace(/ +/, ""),
-        active: $(info).find("td").eq(7).text().replace(/ +/, ""),
-        critical: $(info).find("td").eq(8).text().replace(/ +/, "")
+        active: $(info).find("td").eq(8).text().replace(/ +/, ""),
+        critical: $(info).find("td").eq(9).text().replace(/ +/, "")
     };
     return response;
 }
@@ -45,8 +45,8 @@ async function getAll(result){
             totald: $(info).find("td").eq(4).text().replace(/ +/, ""),
             newd: $(info).find("td").eq(5).text().replace(/ +/, ""),
             recover: $(info).find("td").eq(6).text().replace(/ +/, ""),
-            active: $(info).find("td").eq(7).text().replace(/ +/, ""),
-            critical: $(info).find("td").eq(8).text().replace(/ +/, "")
+            active: $(info).find("td").eq(8).text().replace(/ +/, ""),
+            critical: $(info).find("td").eq(9).text().replace(/ +/, "")
         };
         arr.push(response);
     })
